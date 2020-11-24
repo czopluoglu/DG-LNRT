@@ -1,3 +1,10 @@
+.DS_Store
+data/*
+
+# STAN compilation files
+
+.exe
+
 # History files
 .Rhistory
 .Rapp.history
