@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --account=edquant
+#SBATCH --partition=long
+#SBATCH --job-name=rep53
+#SBATCH --output=/gpfs/projects/edquant/cengiz/dglnrt/rep53.out
+#SBATCH --error=/gpfs/projects/edquant/cengiz/dglnrt/rep53.err
+#SBATCH --time=20160
+#SBATCH --mem=4000M
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=4
+
+module load gcc
+module load R/4.0.2
+
+R --no-save < /gpfs/projects/edquant/cengiz/dglnrt/rep53.r
