@@ -165,7 +165,7 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt/dglnrt2.stan')
       seed = 1234,
       chains = 4,
       parallel_chains = 4,
-      iter_warmup   = 1000,
+      iter_warmup   = 500,
       iter_sampling = 2000,
       refresh = 100,
       adapt_delta = 0.99)
@@ -173,7 +173,7 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt/dglnrt2.stan')
     
     fit$cmdstan_summary()
     
-    stanfit[[i]] <- rstan::read_stan_csv(fit$output_files())
+    stanfit <- rstan::read_stan_csv(fit$output_files())
     
     
     

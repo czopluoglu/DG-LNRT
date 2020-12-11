@@ -154,15 +154,15 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt_null/dglnrt2.stan')
       seed = 1234,
       chains = 4,
       parallel_chains = 4,
-      iter_warmup   = 1000,
-      iter_sampling = 2000,
-      refresh = 1000,
+      iter_warmup   = 500,
+      iter_sampling = 1500,
+      refresh = 100,
       adapt_delta = 0.99)
 
     
     fit$cmdstan_summary()
     
-    stanfit[[i]] <- rstan::read_stan_csv(fit$output_files())
+    stanfit <- rstan::read_stan_csv(fit$output_files())
     
     
 save.image('/gpfs/projects/edquant/cengiz/dglnrt_null/rep7.RData')

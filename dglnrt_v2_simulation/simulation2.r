@@ -173,7 +173,7 @@ mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
     
     fit$cmdstan_summary()
     
-    stanfit[[i]] <- rstan::read_stan_csv(fit$output_files())
+    stanfit <- rstan::read_stan_csv(fit$output_files())
     
     
 save.image(here(''))

@@ -1,14 +1,14 @@
+setwd('B:/Ongoing_Research/Murat/DG-LNRT/Manuscript/JEM/Revision1/dg-lnrt/dglnrt_v2_null/talapas')
 
-
-for(i in 2:100){
+for(i in 1:100){
   
   a <- '#!/bin/bash'
   a <- rbind(a,'#SBATCH --account=edquant')
-  a <- rbind(a,'#SBATCH --partition=longgpu')
-  a <- rbind(a,'#SBATCH --job-name=rep1')
+  a <- rbind(a,'#SBATCH --partition=long')
+  a <- rbind(a,paste0('#SBATCH --job-name=rep',i))
   a <- rbind(a,paste0('#SBATCH --output=/gpfs/projects/edquant/cengiz/dglnrt_null/rep',i,'.out'))
   a <- rbind(a,paste0('#SBATCH --error=/gpfs/projects/edquant/cengiz/dglnrt_null/rep',i,'.err'))
-  a <- rbind(a,'#SBATCH --time=20160')
+  a <- rbind(a,'#SBATCH --time=10080')
   a <- rbind(a,'#SBATCH --mem=4000M')
   a <- rbind(a,'#SBATCH --nodes=1')
   a <- rbind(a,'#SBATCH --ntasks-per-node=1')
@@ -21,5 +21,6 @@ for(i in 2:100){
   
   a <- noquote(a)
   
-  write(a,paste0('batch',i,'.batch'))
+  write(a,paste0('/gpfs/projects/edquant/cengiz/dglnrt_null/batch',i,'.batch'))
+
 }

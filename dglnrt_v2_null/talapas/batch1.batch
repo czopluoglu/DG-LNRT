@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --account=edquant        ### change this to your actual account for charging
-#SBATCH --partition=longgpu       ### queue to submit to
-#SBATCH --job-name=rep1     ### job name
-#SBATCH --output=/gpfs/projects/edquant/cengiz/dglnrt_null/rep1.out   ### file in which to store job stdout
-#SBATCH --error=/gpfs/projects/edquant/cengiz/dglnrt_null/rep1.err    ### file in which to store job stderr
-#SBATCH --time=20160                ### wall-clock time limit, in minutes
-#SBATCH --mem=4000M              ### memory limit per node, in MB
-#SBATCH --nodes=1               ### number of nodes to use
-#SBATCH --ntasks-per-node=1     ### number of tasks to launch per node
-#SBATCH --cpus-per-task=4       ### number of cores for each task
+#SBATCH --account=edquant
+#SBATCH --partition=long
+#SBATCH --job-name=rep1
+#SBATCH --output=/gpfs/projects/edquant/cengiz/dglnrt_null/rep1.out
+#SBATCH --error=/gpfs/projects/edquant/cengiz/dglnrt_null/rep1.err
+#SBATCH --time=10080
+#SBATCH --mem=4000M
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=4
 
 module load gcc
 module load R/4.0.2
