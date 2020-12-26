@@ -32,7 +32,7 @@ require(psych)
     # MODEL PARAMETERS
     
     beta  <- rnorm(25,4.19,0.38)
-    alpha <- rnorm(25,1.18,0.16)^2
+    alpha <- rnorm(25,1.42,0.37)
     
     # Tau for control group
     
@@ -191,6 +191,29 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
 ################################################################################
 ################################################################################
   
+  load(here("data/dglnrt_v1_null/dglnrt_v1_null.RData"))
+  
+  
+# T
+  
+  param <- matrix(nrow=100,ncol=93)
+  corr <- c()
+  
+  for(i in 1:100){
+    fit   <- stanfit[[i]]
+    Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
+    param[i,] = Ts
+  }
+  
+  hist(param)
+  
+  th = 0.99
+  
+  round(c(mean(rowMeans(param>th)),
+          min(rowMeans(param>th)),
+          max(rowMeans(param>th))),3)
+  
+  
 # Betas
   
   param <- matrix(nrow=100,ncol=25)
@@ -205,11 +228,18 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
   }
   
   mean(rowMeans(param)) # average bias
+  min(rowMeans(param)) # average bias
+  max(rowMeans(param)) # average bias
   
-  sqrt(mean(param^2))   # root mean squared error
+  mean(sqrt(rowMeans(param^2))) # average root mean squared error
+  min(sqrt(rowMeans(param^2))) # average root mean squared error
+  max(sqrt(rowMeans(param^2))) # average root mean squared error
+  
    
   mean(corr)            # average correlation
-
+  min(corr)
+  max(corr)
+  
 # Alphas
   
   param <- matrix(nrow=100,ncol=25)
@@ -223,13 +253,19 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
     print(i)
   }
   
-  
+
   mean(rowMeans(param)) # average bias
+  min(rowMeans(param)) # average bias
+  max(rowMeans(param)) # average bias
   
-  sqrt(mean(param^2))   # root mean squared error
+  mean(sqrt(rowMeans(param^2))) # average root mean squared error
+  min(sqrt(rowMeans(param^2))) # average root mean squared error
+  max(sqrt(rowMeans(param^2))) # average root mean squared error
+  
   
   mean(corr)            # average correlation
-  
+  min(corr)
+  max(corr)
   
 # Tau_t
   
@@ -266,27 +302,7 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
   sqrt(mean(param^2))   # root mean squared error
   
   mean(corr)            # average correlation
-  
-# T
-  
-  param <- matrix(nrow=100,ncol=93)
-  corr <- c()
-  
-  for(i in 1:100){
-    fit   <- stanfit[[i]]
-    Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
-    param[i,] = Ts
-  }
-  
-  hist(param)
 
-  th = 0.9
-  
-  rowMeans(param>th)
-  describe(rowMeans(param>th))
-  
-  mean(param>th)
-  
 
 
 
