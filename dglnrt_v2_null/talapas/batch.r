@@ -8,7 +8,7 @@ for(i in 1:100){
   a <- rbind(a,paste0('#SBATCH --job-name=rep',i))
   a <- rbind(a,paste0('#SBATCH --output=/gpfs/projects/edquant/cengiz/dglnrt_null/rep',i,'.out'))
   a <- rbind(a,paste0('#SBATCH --error=/gpfs/projects/edquant/cengiz/dglnrt_null/rep',i,'.err'))
-  a <- rbind(a,'#SBATCH --time=10080')
+  a <- rbind(a,'#SBATCH --time=20160')
   a <- rbind(a,'#SBATCH --mem=4000M')
   a <- rbind(a,'#SBATCH --nodes=1')
   a <- rbind(a,'#SBATCH --ntasks-per-node=1')

@@ -10,7 +10,7 @@ require(psych)
 # This is a code being used for simulating a null data (where there is no item 
 # preknowledge). There are 93 examinees and 25 items as in Real Dataset 1.
 # DG-LNRT model is fitted as usual. We expect DG-LNRT to detect nobody in this 
-# dataset.
+# dataset except false positives.
 
 # Parameters come from EMIP paper where a multigroup lognormal response time
 # model was fitted with gated mechanism using Real Dataset 1.

@@ -1,6 +1,8 @@
 require(cmdstanr)
 require(here)
 require(psych)
+require(rstan)
+require(pROC)
 ########################
 
 # This fits the model to the real dataset by Cizek and Wollack
@@ -141,6 +143,48 @@ stanfit <- rstan::read_stan_csv(fit$output_files())
 save.image(here('dglnrt_v2/results.RData'))
 
 
+###############################################################################
+###############################################################################
+###############################################################################
+
+load(here("data/dglnrt_v2/results.RData"))
+
+
+T <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
+describe(T[,1])
+
+
+flagged <- c()
+for(i in 1:3280){
+  flagged[i] <- unique(d.long[which(d.long$id==i),]$p_flag)
+}
+
+table(flagged)
+
+
+comp <- cbind(flagged,T[,1])
+
+roc(comp[,1],comp[,2])
+
+th = 0.999
+
+tab <- table(comp[,1],(T[,1]>th)*1)
+
+round(tab[1,2]/sum(tab[1,]),3)  # fpr
+round(tab[2,2]/sum(tab[2,]),3)  # tpr
+round(tab[2,2]/sum(tab[,2]),3)  # pr
+
+
+
+
+
+
+
+
+
+
+
+
 
 summary(stanfit, pars = c("mu1","sigma1","sigma_t","sigma_c"), 
         probs = c(0.025, 0.975))$summary
@@ -160,24 +204,6 @@ describe(tau_t[,1])
 tau_c <- summary(stanfit, pars = c("tau_c"), probs = c(0.025, 0.975))$summary
 tau_c
 describe(tau_c[,1])
-
-T <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
-describe(T[,1])
-
-
-flagged <- c()
-for(i in 1:3280){
-  flagged[i] <- unique(d.long[which(d.long$id==i),]$p_flag)
-}
-
-table(flagged)
-
-
-comp <- cbind(flagged,T[,1])
-
-th = 0.99
-
-table(comp[,1],(T[,1]>th)*1)
 
 
 

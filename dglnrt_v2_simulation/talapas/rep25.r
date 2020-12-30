@@ -5,6 +5,8 @@ require(cmdstanr)
 require(here)
 require(rstan)
 require(psych)
+
+set.seed(1025)
 ###############################################################################
 
 # This is a code being used for simulating item preknowledge data. 

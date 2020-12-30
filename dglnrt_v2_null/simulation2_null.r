@@ -166,3 +166,78 @@ mod <- cmdstan_model(here('dglnrt_v2_null/dglnrt2.stan'))
     
     
 save.image(here(''))
+
+################################################################################
+################################################################################
+################################################################################
+
+f <- list.files(here('data/dglnrt_v2_null'))
+
+stanfit.list <- vector('list',100)
+data.list    <- vector('list',100)
+
+for(kk in 1:100){
+ 
+ ch <- file.exists(here(paste0('data/dglnrt_v2_null/rep',kk,'.RData')))  
+
+ if(ch==TRUE){
+
+   load(here(paste0('data/dglnrt_v2_null/rep',kk,'.RData')))
+   stanfit.list[[kk]] <- stanfit
+   data.list[[kk]]    <- data
+   print(kk)
+   
+   rm(list = ls()[!ls()%in%c('stanfit.list','data.list')])
+ }
+}
+
+
+
+param <- matrix(nrow=100,ncol=3280)
+
+for(i in 1:100){
+  
+  if(is.null(stanfit.list[[i]])==FALSE){
+    
+    fit   <- stanfit.list[[i]]
+    Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
+    param[i,] = Ts
+  }
+  
+  print(i)
+}
+
+
+hist(param)
+
+th = 0.99
+
+round(c(mean(rowMeans(param>th)),
+        min(rowMeans(param>th)),
+        max(rowMeans(param>th))),3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

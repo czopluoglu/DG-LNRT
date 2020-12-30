@@ -1,9 +1,7 @@
-require(rstan)
+
 require(cmdstanr)
 require(here)
 require(psych)
-require(ggplot2)
-require(pROC)
 ########################
 
 # This fits the model to the real dataset by Toton and Maynes (2019)
@@ -128,31 +126,20 @@ save.image('dglnrt_v1/results with original priors.RData')
 load(here('data/dglnrt_v1/results with original priors.RData'))
 
 
-params <- summary(stanfit, pars = c("mu1","sigma1","sigma_t","sigma_c",
-                                    "beta","alpha","tau_t","tau_c"), 
+
+
+params <- summary(stanfit, 
+                  pars = c("mu1","sigma1","sigma_t","sigma_c",
+                           'beta','alpha','tau_t','tau_c','T'), 
                   probs = c(0.025, 0.975))$summary
-
-params <- as.data.frame(params)
-
-ggplot(data=params,aes(x=Rhat))+
-  geom_histogram(color='black',fill='white')+
-  theme_bw()
-
-describe(params$Rhat)
-
-
-summary(stanfit, pars = c("mu1","sigma1","sigma_t","sigma_c"), 
-        probs = c(0.025, 0.975))$summary
 
 
 betas <- summary(stanfit, pars = c("beta"), probs = c(0.025, 0.975))$summary
 betas 
-write.table(betas,'betas.csv',sep=',',row.names = FALSE)
 describe(betas[,1])
 
 alphas <- summary(stanfit, pars = c("alpha"), probs = c(0.025, 0.975))$summary
 alphas
-write.table(alphas,'alphas.csv',sep=',',row.names = FALSE)
 describe(alphas[,1])
 
 tau_t <- summary(stanfit, pars = c("tau_t"), probs = c(0.025, 0.975))$summary
@@ -163,30 +150,12 @@ tau_c <- summary(stanfit, pars = c("tau_c"), probs = c(0.025, 0.975))$summary
 tau_c
 describe(tau_c[,1])
 
-
 Ts <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
 Ts
 
+th = .95
 
-t <- c()
-
-for(i in 1:93){
-  t[i]=ifelse(unique(d.long[which(d.long$ID==i),]$COND)==1,0,1)
-}
-
-pROC::roc(t,Ts[,1])
-
-
-th = .99
-
-tab = table(ifelse(Ts[,1]>th,1,0),d.sub$COND)
-
-tab[2,1]/sum(tab[,1]) # false positive rate
-
-sum(tab[2,2:3])/sum(tab[,2:3]) # true positive rate
-
-sum(tab[2,2:3])/sum(tab[2,]) # precision
-
+table(ifelse(Ts[,1]>th,1,0),d.sub$COND)
 
 hist(Ts[,1])
 

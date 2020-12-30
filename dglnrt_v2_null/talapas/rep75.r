@@ -5,6 +5,8 @@ require(cmdstanr)
 require(here)
 require(rstan)
 require(psych)
+
+set.seed(1075)
 ###############################################################################
 
 # This is a code being used for simulating a null data (where there is no item 
@@ -116,6 +118,8 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt_null/dglnrt2.stan')
     
     d.sub <- data$rt[,1:253]
     
+	data$rt[1:5,1:5]
+	
     d.sub$ID <- 1:3280
     
     d.long <- reshape(

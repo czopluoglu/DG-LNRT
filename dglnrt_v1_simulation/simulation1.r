@@ -193,6 +193,56 @@ save.image(here('dglnrt_v1_simulation/results.RData'))
 ################################################################################
 ################################################################################
 
+load(here("data/dglnrt_v1_simulation/results.RData"))
+
+
+
+# T
+
+param <- matrix(nrow=100,ncol=93)
+corr <- c()
+
+for(i in 1:100){
+  fit   <- stanfit[[i]]
+  Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
+  param[i,] = Ts
+  print(i)
+}
+
+param1 <- param[,1:33]
+param2 <- param[,34:93]
+
+th = 0.90
+
+mean(param1>th)
+
+mean(param2>th)
+
+
+th = 0.99
+
+fp <- c()
+tp <- c()
+pr <- c()
+
+for(i in 1:100){
+  
+  fit   <- stanfit[[i]]
+  Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
+  t <- ifelse(Ts>th,1,0)
+  true <- c(rep(0,33),rep(1,60))
+  tab <- table(true,t)
+  fp[i] <- tab[1,2]/33
+  tp[i] <- tab[2,2]/60
+  pr[i] <- tab[2,2]/sum(tab[,2])
+  print(i)
+}
+
+round(c(mean(fp),min(fp),max(fp)),3)
+round(c(mean(tp),min(tp),max(tp)),3)
+round(c(mean(pr),min(pr),max(pr)),3)
+
+
 # Betas
 
 param <- matrix(nrow=100,ncol=25)
@@ -206,11 +256,21 @@ for(i in 1:100){
   print(i)
 }
 
-mean(rowMeans(param)) # average bias
 
-sqrt(mean(param^2))   # root mean squared error
+mean(rowMeans(param)) # average bias
+min(rowMeans(param)) # average bias
+max(rowMeans(param)) # average bias
+
+mean(sqrt(rowMeans(param^2))) # average root mean squared error
+min(sqrt(rowMeans(param^2))) # average root mean squared error
+max(sqrt(rowMeans(param^2))) # average root mean squared error
+
 
 mean(corr)            # average correlation
+min(corr)
+max(corr)
+
+
 
 # Alphas
 
@@ -226,11 +286,21 @@ for(i in 1:100){
 }
 
 
-mean(rowMeans(param)) # average bias
 
-sqrt(mean(param^2))   # root mean squared error
+mean(rowMeans(param)) # average bias
+min(rowMeans(param)) # average bias
+max(rowMeans(param)) # average bias
+
+mean(sqrt(rowMeans(param^2))) # average root mean squared error
+min(sqrt(rowMeans(param^2))) # average root mean squared error
+max(sqrt(rowMeans(param^2))) # average root mean squared error
+
 
 mean(corr)            # average correlation
+min(corr)
+max(corr)
+
+
 
 
 # Tau_t
@@ -268,78 +338,6 @@ mean(rowMeans(param)) # average bias
 sqrt(mean(param^2))   # root mean squared error
 
 mean(corr)            # average correlation
-
-# T
-
-param <- matrix(nrow=100,ncol=93)
-corr <- c()
-
-for(i in 1:100){
-  fit   <- stanfit[[i]]
-  Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
-  param[i,] = Ts
-}
-
-param1 <- param[,1:33]
-param2 <- param[,34:93]
-
-th = 0.90
-
-hist(param1)
-mean(param1>th)
-
-hist(param2)
-mean(param2>th)
-
-
-th = 0.9
-
-fp <- c()
-tp <- c()
-pr <- c()
-
-for(i in 1:100){
-  
-  fit   <- stanfit[[i]]
-  Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
-  t <- ifelse(Ts>th,1,0)
-  true <- c(rep(0,33),rep(1,60))
-  tab <- table(true,t)
-  fp[i] <- tab[1,2]/33
-  tp[i] <- tab[2,2]/60
-  pr[i] <- tab[2,2]/sum(tab[,2])
-}
-
-
-describe(fp)
-describe(tp)
-describe(pr)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
