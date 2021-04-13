@@ -5,12 +5,13 @@ require(cmdstanr)
 require(here)
 require(rstan)
 require(psych)
-###############################################################################
+################################################################################
 
 # This is a code being used for simulating a null data (where there is no item 
 # preknowledge). There are 93 examinees and 25 items as in Real Dataset 1.
-# DG-LNRT model is fitted as usual. We expect DG-LNRT to detect nobody in this 
-# dataset except false positives.
+# DG-LNRT model is fitted as usual. 
+
+# We expect DG-LNRT to detect nobody in this dataset except false positives.
 
 # Parameters come from EMIP paper where a multigroup lognormal response time
 # model was fitted with gated mechanism using Real Dataset 1.
@@ -21,9 +22,9 @@ require(psych)
 # Prepare an Appendix describing the model, model estimation, fitting, etc.
 # Or, put the whole paper as an appendix. 
 
-####################################################################
-####################################################################
-####################################################################
+################################################################################
+################################################################################
+################################################################################
 
 # A generic function to simulate DG-LNRT data with no item preknowledge
 
@@ -118,10 +119,19 @@ require(psych)
 # RUN 100 Replications
 # Simulate data and fit DG-LNRT
 
+  # Create two list objects with length of 100 to save the output for each replication
+  
   sim.datasets <- vector('list',100)
   stanfit <- vector('list',100)
   
+  # Read the Stan model syntax, this is same across all replications
+  
   mod <- cmdstan_model(here('dglnrt_v1_null/dglnrt2.stan'))
+  
+  # Run a loop from 1 to 100
+  # Each replication generates data based on the above specifications
+  # fits the model and saves the object in the created list objects
+  # for further processing
   
   for(i in 1:100){
     
@@ -189,12 +199,16 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
 ################################################################################
 ################################################################################
 ################################################################################
-################################################################################
+
+load(here("data/dglnrt_v1_null/dglnrt_v1_null.RData"))
   
-  load(here("data/dglnrt_v1_null/dglnrt_v1_null.RData"))
   
-  
-# T
+# For each replication, extract the estimate of T for each individual
+# Save them in a 100 x 93 matrix
+  # Each row represents a replication
+  # Each column represents an individual within a replication
+  # Cell values are the estimate of posterior probability of item preknowledge
+  # for an individual in a replication
   
   param <- matrix(nrow=100,ncol=93)
   corr <- c()
@@ -203,16 +217,23 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
     fit   <- stanfit[[i]]
     Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
     param[i,] = Ts
+    print(i)
   }
   
   hist(param)
   
-  th = 0.99
+  # For a given cut-off value, compute the average proportion of falsely 
+  # identified individuals across 100 replications
+  
+  th = 0.9
   
   round(c(mean(rowMeans(param>th)),
           min(rowMeans(param>th)),
-          max(rowMeans(param>th))),3)
+          max(rowMeans(param>th))),4)
   
+################################################################################
+# Check item parameter recovery across 100 replications
+################################################################################
   
 # Betas
   
@@ -266,6 +287,10 @@ save.image(here('dglnrt_v1_null/dglnrt_v1_null.RData'))
   mean(corr)            # average correlation
   min(corr)
   max(corr)
+
+################################################################################
+# Check person parameter recovery across 100 replications
+################################################################################
   
 # Tau_t
   

@@ -121,13 +121,22 @@ require(psych)
   
 ##############################################################################
 
-mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
+# This section runs a single replication
 
+  # Read the Stan model syntax, this is same across all replications
+  
+    mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
+
+  # Simulate data 
+    
     data <- sim_dglnrt()
     
     d.sub <- data$rt[,1:253]
     
     d.sub$ID <- 1:3280
+   
+    
+  # Rehape the data into the long format
     
     d.long <- reshape(
       data        = d.sub,
@@ -149,6 +158,9 @@ mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
     d.long[which(d.long$Item%in%flagged.item==TRUE),]$i.status = 1
     d.long[which(d.long$Item%in%flagged.item==FALSE),]$i.status = 0
     
+    
+  # Data object for Stan
+    
     data_rt <- list(
       J              = 253,
       I              = 3280,
@@ -159,6 +171,8 @@ mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
       Y              = d.long$logRT
     )
     
+    
+  # Fit the model using cmdstan
     
     fit <- mod$sample(
       data = data_rt,
@@ -171,9 +185,118 @@ mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
       adapt_delta = 0.99)
 
     
+  # Save the output file   
+    
     fit$cmdstan_summary()
     
     stanfit <- rstan::read_stan_csv(fit$output_files())
     
     
-save.image(here(''))
+    save.image(here(''))
+
+    
+    # 100 replications were run independently in the UO computing cluster (Talapas)
+    # due to the computational demand 
+    
+    # See the code under /dglnrt_v2_simulation/talapas for more syntax and specific 
+    # files
+
+################################################################################
+################################################################################
+################################################################################
+#
+# Outcome Analysis
+#
+################################################################################
+################################################################################
+################################################################################
+    
+# Read the output files for 100 replications
+    
+# Create two list objects with length of 100 to save the output for each replication
+    
+f <- list.files(here('data/dglnrt_v2_simulation'))
+
+stanfit.list <- vector('list',100)
+data.list    <- vector('list',100)
+
+for(kk in 1:100){
+  
+  ch <- file.exists(here(paste0('data/dglnrt_v2_simulation/rep',kk,'.RData')))  
+  
+  if(ch==TRUE){
+    
+    load(here(paste0('data/dglnrt_v2_simulation/rep',kk,'.RData')))
+    stanfit.list[[kk]] <- stanfit
+    data.list[[kk]]    <- data
+    print(kk)
+    
+    rm(list = ls()[!ls()%in%c('stanfit.list','data.list')])
+  }
+
+}
+
+################################################################################
+# For each replication, extract the estimate of T for each individual
+# Save them in a 100 x 3280 matrix
+# Each row represents a replication
+# Each column represents an individual within a replication
+# Cell values are the estimate of posterior probability of item preknowledge
+# for an individual in a replication
+
+
+param <- matrix(nrow=100,ncol=3280)
+
+for(i in 1:100){
+  
+  if(is.null(stanfit.list[[i]])==FALSE){
+    
+    fit   <- stanfit.list[[i]]
+    Ts <- as.numeric(summary(fit, pars = c("T"), probs = c(0.025, 0.975))$summary[,1])
+    param[i,] = Ts
+  }
+  
+  print(i)
+}
+
+param <- param[1:97,]
+
+
+# For a given cut-off value, compute the average proportion of falsely 
+# identified individuals across 100 replications
+
+table(data.list[[1]]$rt$gr)
+
+th = 0.999
+
+fp <- c()
+tp <- c()
+pr <- c()
+
+for(i in 1:97){
+  
+  Ts <- param[i,]
+  t  <- ifelse(Ts>th,1,0)
+  true <- ifelse(data.list[[i]]$rt$gr==2,1,0)
+  tab <- table(true,t)
+  fp[i] <- tab[1,2]/3186
+  tp[i] <- tab[2,2]/94
+  pr[i] <- tab[2,2]/sum(tab[,2])
+  print(i)
+}
+
+round(c(mean(tp),min(tp),max(tp)),3)
+round(c(mean(fp),min(fp),max(fp)),3)
+round(c(mean(pr),min(pr),max(pr)),3)
+
+
+
+
+
+
+
+
+
+
+
+

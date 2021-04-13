@@ -110,14 +110,22 @@ require(psych)
 
 ##############################################################################
 
-mod <- cmdstan_model(here('dglnrt_v2_null/dglnrt2.stan'))
+# This section runs a single replication
+  
+  # Read the Stan model syntax, this is same across all replications
+  
+  mod <- cmdstan_model(here('dglnrt_v2_null/dglnrt2.stan'))
 
-    data <- sim_dglnrt()
+  # Simulate data 
+  
+  data <- sim_dglnrt()
     
-    d.sub <- data$rt[,1:253]
+  d.sub <- data$rt[,1:253]
     
-    d.sub$ID <- 1:3280
-    
+  d.sub$ID <- 1:3280
+  
+  # Rehape the data into the long format
+  
     d.long <- reshape(
       data        = d.sub,
       idvar       = "ID",
@@ -138,6 +146,8 @@ mod <- cmdstan_model(here('dglnrt_v2_null/dglnrt2.stan'))
     d.long[which(d.long$Item%in%flagged.item==TRUE),]$i.status = 1
     d.long[which(d.long$Item%in%flagged.item==FALSE),]$i.status = 0
     
+  # Data object for Stan
+    
     data_rt <- list(
       J              = 253,
       I              = 3280,
@@ -148,6 +158,7 @@ mod <- cmdstan_model(here('dglnrt_v2_null/dglnrt2.stan'))
       Y              = d.long$logRT
     )
     
+  # Fit the model using cmdstan
     
     fit <- mod$sample(
       data = data_rt,
@@ -160,19 +171,39 @@ mod <- cmdstan_model(here('dglnrt_v2_null/dglnrt2.stan'))
       adapt_delta = 0.99)
 
     
+    # Save the output file
+    
     fit$cmdstan_summary()
     
-    stanfit[[i]] <- rstan::read_stan_csv(fit$output_files())
+    stanfit <- rstan::read_stan_csv(fit$output_files())
     
     
-save.image(here(''))
+    save.image(here(''))
+    
+    
+# 100 replications were run independently in the UO computing cluster (Talapas)
+# due to the computational demand 
+    
+# See the code under /dglnrt_v2_null/talapas for more syntax and specific 
+    # files
 
 ################################################################################
 ################################################################################
 ################################################################################
+#
+# Outcome Analysis
+#
+################################################################################
+################################################################################
+################################################################################
 
+# Read the output files for 100 replications
+
+# Create two list objects with length of 100 to save the output for each replication
+
+        
 f <- list.files(here('data/dglnrt_v2_null'))
-
+    
 stanfit.list <- vector('list',100)
 data.list    <- vector('list',100)
 
@@ -191,7 +222,22 @@ for(kk in 1:100){
  }
 }
 
+# Save the image not to repetitively do this again when needed
 
+save.image(here("data/dglnrt_v2_null/results.RData"))
+
+################################################################################
+
+# Load the output files
+
+load(here("data/dglnrt_v2_null/results.RData"))
+
+# For each replication, extract the estimate of T for each individual
+# Save them in a 100 x 3280 matrix
+# Each row represents a replication
+# Each column represents an individual within a replication
+# Cell values are the estimate of posterior probability of item preknowledge
+# for an individual in a replication
 
 param <- matrix(nrow=100,ncol=3280)
 
@@ -207,14 +253,19 @@ for(i in 1:100){
   print(i)
 }
 
+param <- param[8:100,]
 
 hist(param)
 
+
+# For a given cut-off value, compute the average proportion of falsely 
+# identified individuals across 100 replications
+
 th = 0.99
 
-round(c(mean(rowMeans(param>th)),
-        min(rowMeans(param>th)),
-        max(rowMeans(param>th))),3)
+round(c(mean(rowMeans(param>th,na.rm=TRUE)),
+        min(rowMeans(param>th,na.rm=TRUE)),
+        max(rowMeans(param>th,na.rm=TRUE))),3)
 
 
 

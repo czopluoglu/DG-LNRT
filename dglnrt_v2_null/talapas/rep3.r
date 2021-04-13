@@ -110,7 +110,11 @@ require(psych)
 
 ##############################################################################
 
-mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt_null/dglnrt2.stan')
+ #mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt_null/dglnrt2.stan')
+
+
+mod <- cmdstan_model('B:/Ongoing_Research/Murat/DG-LNRT/Manuscript/JEM/Revision1/dg-lnrt/dglnrt_v2_null/talapas/dglnrt2.stan')
+
 
     data <- sim_dglnrt()
     
