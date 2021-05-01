@@ -3,8 +3,6 @@
 A repository for the code being used to run additional analysis and simulations 
 related to DG-LNRT paper.
 
-https://psyarxiv.com/bqa3t/
-
 Below is a list of folders with explanations for each folder:
 
 - **/dglnrt_v1**: This folder includes the code for fitting DG-LNRT to the first real
