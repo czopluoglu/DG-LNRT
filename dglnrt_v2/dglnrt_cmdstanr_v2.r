@@ -66,6 +66,122 @@ d.long[ind,]$id = as.numeric(substring(d.long[ind,]$EID,4,7))+1636
     tab
 
     unique(d.long$id)
+    
+########################################################################
+# Descriptive Statistics
+    
+# Flagged Items - Unflagged Examinees
+    
+flagged <- sort(unique(d.long[d.long$i_flag=='Flagged',]$item))
+    
+desc.rt <- matrix(nrow=length(flagged),ncol=4)
+
+desc.rt[,1] <- flagged
+
+for(i in 1:nrow(desc.rt)){
+  
+  temp <- exp(d.long[d.long$item==flagged[i] & d.long$p_flag==0,]$RT)
+  
+  desc.rt[i,2] <- length(temp)
+  desc.rt[i,3] <- mean(temp)
+  desc.rt[i,4] <- sd(temp)
+}
+
+rt10 <- desc.rt[,3]
+
+# Flagged Items - Flagged Examinees
+
+
+flagged <- sort(unique(d.long[d.long$i_flag=='Flagged',]$item))
+
+desc.rt <- matrix(nrow=length(flagged),ncol=4)
+
+desc.rt[,1] <- flagged
+
+for(i in 1:nrow(desc.rt)){
+  
+  temp <- exp(d.long[d.long$item==flagged[i] & d.long$p_flag==1,]$RT)
+  
+  desc.rt[i,2] <- length(temp)
+  desc.rt[i,3] <- mean(temp)
+  desc.rt[i,4] <- sd(temp)
+}
+
+rt11 <- desc.rt[,3]
+
+
+plot(rt10,rt11,
+     ylim=c(10,120),
+     xlim=c(10,120),
+     xlab = 'Response Time in Seconds by Unflagged Examinees',
+     ylab = 'Response Time in Seconds by Flagged Examinees')
+
+abline(0,1,lty=2,col='gray')
+
+
+# Unflagged Items - Unflagged Examinees
+
+unflagged <- sort(unique(d.long[d.long$i_flag=='Unflagged',]$item))
+
+desc.rt <- matrix(nrow=length(unflagged),ncol=4)
+
+desc.rt[,1] <- unflagged
+
+for(i in 1:nrow(desc.rt)){
+  
+  temp <- exp(d.long[d.long$item==unflagged[i] & d.long$p_flag==0,]$RT)
+  
+  desc.rt[i,2] <- length(temp)
+  desc.rt[i,3] <- mean(temp)
+  desc.rt[i,4] <- sd(temp)
+}  
+
+
+rt00 <- desc.rt[,3]
+
+
+
+# Unflagged Items - Flagged Examinees
+
+unflagged <- sort(unique(d.long[d.long$i_flag=='Unflagged',]$item))
+
+desc.rt <- matrix(nrow=length(unflagged),ncol=4)
+
+desc.rt[,1] <- unflagged
+
+for(i in 1:nrow(desc.rt)){
+  
+  temp <- exp(d.long[d.long$item==unflagged[i] & d.long$p_flag==1,]$RT)
+  
+  desc.rt[i,2] <- length(temp)
+  desc.rt[i,3] <- mean(temp)
+  desc.rt[i,4] <- sd(temp)
+}  
+
+
+rt01 <- desc.rt[,3]
+
+
+plot(rt00,rt01,
+     ylim=c(10,120),
+     xlim=c(10,120),
+     xlab = 'Response Time in Seconds by Unflagged Examinees',
+     ylab = 'Response Time in Seconds by Flagged Examinees',
+     main = 'Unflagged Items')
+
+abline(0,1,lty=2,col='gray')
+
+
+
+mean(rt10)
+mean(rt11)
+
+
+mean(rt00)
+mean(rt01)
+
+
+
 ########################################################################
 
 # Add a variable for item compromised status
@@ -264,6 +380,8 @@ load(here("data/dglnrt_v2/results.RData"))
 T <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
 describe(T[,1])
 
+extract(stanfit)
+
 # Create a vector for person status (flagged vs. not flagged) to compare with Ts
 
 flagged <- c()
@@ -302,7 +420,12 @@ describe(betas[,1])
 
 alphas <- summary(stanfit, pars = c("alpha"), probs = c(0.025, 0.975))$summary
 alphas
-describe(alphas[,1])
+describe(alphas[,1]^2)
+
+alpha.chain <- extract(stanfit)$alpha
+
+alphas2 <- alpha.chain^2
+
 
 # Extract the tau_t
 
@@ -316,6 +439,27 @@ describe(tau_t[,1])
 tau_c <- summary(stanfit, pars = c("tau_c"), probs = c(0.025, 0.975))$summary
 tau_c
 describe(tau_c[,1])
+
+
+
+hist(c(T[,7],betas[,7],alphas[,7],tau_t[,7],tau_c[,7]))
+
+mean(c(T[,7],betas[,7],alphas[,7],tau_t[,7],tau_c[,7]),na.rm=TRUE)
+min(c(T[,7],betas[,7],alphas[,7],tau_t[,7],tau_c[,7]),na.rm=TRUE)
+max(c(T[,7],betas[,7],alphas[,7],tau_t[,7],tau_c[,7]),na.rm=TRUE)
+
+
+describe(betas[,1])
+
+describe(alphas[,1]^2)
+
+
+
+
+
+
+
+
 
 
 

@@ -1,3 +1,7 @@
+require(MASS)
+require(lavaan)
+require(psych)
+
 ####################################################################
 ####################################################################
 ####################################################################
@@ -8,8 +12,8 @@ sim_dglnrt <- function() {
   
   # MODEL PARAMETERS
   
-  beta  <- rnorm(253,4.03,0.32)
-  alpha <- rnorm(253,1.46,0.09)
+  beta  <- rnorm(253,3.98,0.32)
+  alpha <- rnorm(253,2.06,0.28)
   
   # Tau for unflagged examinees
   
@@ -120,9 +124,14 @@ set.seed(4102021)
 
 TypeI <- matrix(nrow=100,ncol=4)
 
+datas <- vector('list',100)
+params <- vector('list',100)
+
 for(R in 1:100){
   
   data <- sim_dglnrt()
+  
+  datas[[R]] <- data
   
   ly        <- data.frame(log(data$rt[,1:253]))
   
@@ -139,10 +148,10 @@ for(R in 1:100){
   
   pars      <- coef(fit)
   
+  params[[R]] <- pars
   
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
-  
   
   L <- Lambdas(ltimes = as.matrix(ly),
                comp   = sample(1:253,91),
@@ -162,4 +171,36 @@ round(colMeans(TypeI)/3280,4)
 round(apply(TypeI,2,min)/3280,4)
 
 round(apply(TypeI,2,max)/3280,4)
+
+################################################################################
+
+# Parameter recovery
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(R in 1:100){
+  
+  tr[R,]  <- datas[[R]]$a
+  est[R,] <- 1/sqrt(params[[R]][1:253])
+  
+}
+
+round(mean(colMeans(tr-est)),3)
+
+
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(R in 1:100){
+  
+  tr[R,]  <- datas[[R]]$b
+  est[R,] <- params[[R]][255:507]
+  
+}
+
+round(mean(colMeans(tr-est)),3)
+
+
 

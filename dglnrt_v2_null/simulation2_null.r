@@ -267,7 +267,45 @@ round(c(mean(rowMeans(param>th,na.rm=TRUE)),
         min(rowMeans(param>th,na.rm=TRUE)),
         max(rowMeans(param>th,na.rm=TRUE))),3)
 
+################################################################################
+# Check item parameter recovery across 100 replications
+################################################################################
 
+# Betas
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(i in 8:100){
+  fit     <- stanfit.list[[i]]
+  est[i,] <- as.numeric(summary(fit, pars = c("beta"), probs = c(0.025, 0.975))$summary[,1])
+  tr[i,]  <-  data.list[[i]]$b
+  print(i)
+}
+
+tr  <- tr[8:100,]
+est <- est[8:100,]
+
+round(mean(colMeans(tr-est)),3)
+
+
+
+# Alphas
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(i in 8:100){
+  fit     <- stanfit.list[[i]]
+  est[i,] <- as.numeric(summary(fit, pars = c("alpha"), probs = c(0.025, 0.975))$summary[,1])
+  tr[i,]  <-  data.list[[i]]$a
+  print(i)
+}
+
+tr  <- tr[8:100,]
+est <- est[8:100,]
+
+round(mean(colMeans(tr-est)),3)
 
 
 

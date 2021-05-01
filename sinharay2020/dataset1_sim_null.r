@@ -1,3 +1,8 @@
+
+require(lavaan)
+require(psych)
+require(MASS)
+
 ####################################################################
 ####################################################################
 ####################################################################
@@ -8,8 +13,8 @@ sim_dglnrt <- function() {
   
   # MODEL PARAMETERS
   
-  beta  <- rnorm(25,4.15,0.39)
-  alpha <- rnorm(25,1.36,0.30)
+  beta  <- rnorm(25,4.19,0.38)
+  alpha <- rnorm(25,1.42,0.37)
   
   # Tau for control group
   
@@ -125,11 +130,15 @@ Lambdas <- function(ltimes, comp,alpha,beta){
 
 set.seed(4102021)
 
-TypeI <- matrix(nrow=100,ncol=4)
+TypeI <- matrix(nrow=1000,ncol=4)
+datas <- vector('list',1000)
+params <- vector('list',1000)
 
-for(R in 1:100){
+for(R in 1:1000){
 
   data <- sim_dglnrt()
+  
+  datas[[R]] <- data
   
   ly        <- data.frame(log(data$rt[1:25]))
 
@@ -148,7 +157,8 @@ for(R in 1:100){
 
   pars      <- coef(fit)
 
-
+  params[[R]] <- pars
+  
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
 
@@ -171,4 +181,52 @@ round(colMeans(TypeI)/93,4)
 round(apply(TypeI,2,min)/93,4)
 
 round(apply(TypeI,2,max)/93,4)
+
+
+
+################################################################################
+
+# Parameter recovery
+
+tr <- matrix(NA,1000,25)
+est <- matrix(NA,1000,25)
+
+for(R in 1:1000){
+
+  tr[R,]  <- datas[[R]]$a
+  est[R,] <- 1/sqrt(params[[R]][1:25])
+
+}
+
+pos1 <- seq(1,25,2)
+pos2 <- seq(2,25,2)
+
+
+round(mean(colMeans((tr[,pos1] - est[,pos1]))),3)
+round(mean(colMeans((tr[,pos2] - est[,pos2]))),3)
+
+
+
+
+
+tr2 <- matrix(NA,1000,25)
+est2 <- matrix(NA,1000,25)
+
+for(R in 1:1000){
+  
+  tr2[R,]  <- datas[[R]]$b
+  est2[R,] <- params[[R]][27:51]
+  
+}
+
+round(mean(colMeans((tr2[,pos1] - est2[,pos1]))),3)
+round(mean(colMeans((tr2[,pos2] - est2[,pos2]))),3)
+
+
+
+
+
+
+
+
 

@@ -289,7 +289,72 @@ round(c(mean(tp),min(tp),max(tp)),3)
 round(c(mean(fp),min(fp),max(fp)),3)
 round(c(mean(pr),min(pr),max(pr)),3)
 
+################################################################################
+# Check item parameter recovery across 100 replications
+################################################################################
 
+# Betas
+
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(i in 1:97){
+  fit     <- stanfit.list[[i]]
+  est[i,] <- as.numeric(summary(fit, pars = c("beta"), probs = c(0.025, 0.975))$summary[,1])
+  tr[i,]  <-  data.list[[i]]$b
+  print(i)
+}
+
+tr  <- tr[1:97,]
+est <- est[1:97,] 
+
+bias1 <- c()
+bias2 <- c()
+
+for(i in 1:97){
+  
+  temp <- tr[i,] - est[i,]
+  
+  bias1[i] = mean(temp[which(data.list[[i]]$C==0)])
+  
+  bias2[i] = mean(temp[which(data.list[[i]]$C==1)])
+  
+}
+
+round(mean(bias1),3)
+round(mean(bias2),3)
+
+# Alphas
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(i in 1:97){
+  fit     <- stanfit.list[[i]]
+  est[i,] <- as.numeric(summary(fit, pars = c("alpha"), probs = c(0.025, 0.975))$summary[,1])
+  tr[i,]  <-  data.list[[i]]$a
+  print(i)
+}
+
+tr  <- tr[1:97,]
+est <- est[1:97,] 
+
+bias1 <- c()
+bias2 <- c()
+
+for(i in 1:97){
+  
+  temp <- tr[i,] - est[i,]
+  
+  bias1[i] = mean(temp[which(data.list[[i]]$C==0)])
+  
+  bias2[i] = mean(temp[which(data.list[[i]]$C==1)])
+  
+}
+
+round(mean(bias1),3)
+round(mean(bias2),3)
 
 
 

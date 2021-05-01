@@ -4,16 +4,17 @@ load(here("data/dglnrt_v1/results with original priors.RData"))
 head(d.long)
 head(d.sub)
 
-rt <- log(d.sub[,3:27])
+require(lavaan)
+
+################################################################################
+
+rt  <- log(d.sub[,3:27])
     
-ly        <- data.frame(rt)
+ly  <- data.frame(rt)
 
-n <- ncol(ly)
+n   <- ncol(ly)
 
-vcov <- cov(ly,use='pairwise.complete.obs')
-  
-  
-  
+
 model     <- paste("f1=~", 
                    paste0("a*Q",1:(n-1),"RT + ", collapse=""), 
                    paste("a*Q", n,"RT",sep=""))

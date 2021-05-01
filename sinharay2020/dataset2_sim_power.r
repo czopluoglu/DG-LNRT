@@ -8,8 +8,8 @@ sim_dglnrt <- function() {
   
   # MODEL PARAMETERS
   
-  beta  <- rnorm(253,4.03,0.32)
-  alpha <- rnorm(253,1.46,0.09)
+  beta  <- rnorm(253,3.98,0.32)
+  alpha <- rnorm(253,2.06,0.28)
   
   # Tau for unflagged examinees
   
@@ -124,10 +124,14 @@ set.seed(4102021)
 fpr <- matrix(nrow=100,ncol=4)
 tpr <- matrix(nrow=100,ncol=4)
 pre <- matrix(nrow=100,ncol=4)
+datas <- vector('list',100)
+params <- vector('list',100)
 
 for(R in 1:100){
   
   data <- sim_dglnrt()
+  
+  datas[[R]] <- data
   
   ly        <- data.frame(log(data$rt[,1:253]))
   
@@ -144,6 +148,7 @@ for(R in 1:100){
   
   pars      <- coef(fit)
   
+  params[[R]] <- pars
   
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
@@ -185,6 +190,81 @@ round(apply(tpr,2,max),3)
 round(colMeans(pre),3)
 round(apply(pre,2,min),3)
 round(apply(pre,2,max),3)
+
+
+################################################################################
+
+# Parameter recovery
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(R in 1:100){
+  
+  tr[R,]  <- datas[[R]]$a
+  est[R,] <- 1/sqrt(params[[R]][1:253])
+  
+}
+
+
+bias1 <- c()
+bias2 <- c()
+
+for(R in 1:100){
+  
+  temp <- tr[R,] - est[R,]
+  
+  bias1[R] = mean(temp[which(datas[[R]]$C==0)])
+  
+  bias2[R] = mean(temp[which(datas[[R]]$C==1)])
+  
+}
+
+round(mean(bias1),3)
+round(mean(bias2),3)
+
+
+
+tr <- matrix(NA,100,253)
+est <- matrix(NA,100,253)
+
+for(R in 1:100){
+  
+  tr[R,]  <- datas[[R]]$b
+  est[R,] <- params[[R]][255:507]
+  
+}
+
+
+bias1 <- c()
+bias2 <- c()
+
+for(R in 1:100){
+  
+  temp <- tr[R,] - est[R,]
+  
+  bias1[R] = mean(temp[which(datas[[R]]$C==0)])
+  
+  bias2[R] = mean(temp[which(datas[[R]]$C==1)])
+  
+}
+
+round(mean(bias1),3)
+round(mean(bias2),3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ################################################################################
@@ -313,10 +393,14 @@ set.seed(4102021)
 fpr <- matrix(nrow=100,ncol=4)
 tpr <- matrix(nrow=100,ncol=4)
 pre <- matrix(nrow=100,ncol=4)
+datas <- vector('list',100)
+params <- vector('list',100)
 
 for(R in 1:100){
   
-  data <- sim_dglnrt(N=3300,n=180,pN=0.03,pi=0.35)
+  data <- sim_dglnrt(N=1650,n=170,pN=0.04,pi=0.3)
+  
+  datas[[R]] <- data
   
   ly        <- data.frame(log(data$rt[,1:(ncol(data$rt)-1)]))
   
@@ -333,7 +417,7 @@ for(R in 1:100){
                    auto.var=TRUE)
   
   pars      <- coef(fit)
-  
+  params[[R]] <- pars
   
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
@@ -375,5 +459,66 @@ round(apply(tpr,2,max),3)
 round(colMeans(pre),3)
 round(apply(pre,2,min),3)
 round(apply(pre,2,max),3)
+
+
+################################################################################
+
+# Parameter recovery
+
+tr <- matrix(NA,100,170)
+est <- matrix(NA,100,170)
+
+for(R in 1:100){
+  
+  tr[R,]  <- datas[[R]]$a
+  est[R,] <- 1/sqrt(params[[R]][1:170])
+  
+}
+
+
+bias1 <- c()
+bias2 <- c()
+
+for(R in 1:100){
+  
+  temp <- tr[R,] - est[R,]
+  
+  bias1[R] = mean(temp[which(datas[[R]]$C==0)])
+  
+  bias2[R] = mean(temp[which(datas[[R]]$C==1)])
+  
+}
+
+round(mean(bias1),3)
+round(mean(bias2),3)
+
+
+
+tr <- matrix(NA,100,170)
+est <- matrix(NA,100,170)
+
+for(R in 1:100){
+  
+  tr[R,]  <- datas[[R]]$b
+  est[R,] <- params[[R]][172:341]
+  
+}
+
+
+bias1 <- c()
+bias2 <- c()
+
+for(R in 1:100){
+  
+  temp <- tr[R,] - est[R,]
+  
+  bias1[R] = mean(temp[which(datas[[R]]$C==0)])
+  
+  bias2[R] = mean(temp[which(datas[[R]]$C==1)])
+  
+}
+
+round(mean(bias1),3)
+round(mean(bias2),3)
 
 

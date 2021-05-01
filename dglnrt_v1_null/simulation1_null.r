@@ -225,7 +225,7 @@ load(here("data/dglnrt_v1_null/dglnrt_v1_null.RData"))
   # For a given cut-off value, compute the average proportion of falsely 
   # identified individuals across 100 replications
   
-  th = 0.9
+  th = 0.999
   
   round(c(mean(rowMeans(param>th)),
           min(rowMeans(param>th)),
@@ -237,57 +237,82 @@ load(here("data/dglnrt_v1_null/dglnrt_v1_null.RData"))
   
 # Betas
   
-  param <- matrix(nrow=100,ncol=25)
-  corr <- c()
+  tr <- matrix(NA,100,25)
+  est <- matrix(NA,100,25)
   
   for(i in 1:100){
-    fit   <- stanfit[[i]]
-    betas <- as.numeric(summary(fit, pars = c("beta"), probs = c(0.025, 0.975))$summary[,1])
-    param[i,] = betas - sim.datasets[[i]]$b
-    corr[i] = cor(betas, sim.datasets[[i]]$b)
+    fit     <- stanfit[[i]]
+    est[i,] <- as.numeric(summary(fit, pars = c("beta"), probs = c(0.025, 0.975))$summary[,1])
+    tr[i,]  <-  sim.datasets[[i]]$b
     print(i)
   }
   
-  mean(rowMeans(param)) # average bias
-  min(rowMeans(param)) # average bias
-  max(rowMeans(param)) # average bias
   
-  mean(sqrt(rowMeans(param^2))) # average root mean squared error
-  min(sqrt(rowMeans(param^2))) # average root mean squared error
-  max(sqrt(rowMeans(param^2))) # average root mean squared error
+  pos1 <- seq(1,25,2)
+  pos2 <- seq(2,25,2)
   
-   
-  mean(corr)            # average correlation
-  min(corr)
-  max(corr)
+  
+  round(mean(colMeans((tr[,pos1] - est[,pos1]))),3)
+  round(mean(colMeans((tr[,pos2] - est[,pos2]))),3)
+  
+  
   
 # Alphas
   
-  param <- matrix(nrow=100,ncol=25)
-  corr <- c()
+  tr <- matrix(NA,100,25)
+  est <- matrix(NA,100,25)
   
   for(i in 1:100){
     fit   <- stanfit[[i]]
-    alphas <- as.numeric(summary(fit, pars = c("alpha"), probs = c(0.025, 0.975))$summary[,1])
-    param[i,] = alphas - sim.datasets[[i]]$a
-    corr[i] = cor(alphas, sim.datasets[[i]]$a)
-    print(i)
+    est[i,] <- as.numeric(summary(fit, pars = c("alpha"), probs = c(0.025, 0.975))$summary[,1])
+    tr[i,]  <- sim.datasets[[i]]$a
   }
   
-
-  mean(rowMeans(param)) # average bias
-  min(rowMeans(param)) # average bias
-  max(rowMeans(param)) # average bias
-  
-  mean(sqrt(rowMeans(param^2))) # average root mean squared error
-  min(sqrt(rowMeans(param^2))) # average root mean squared error
-  max(sqrt(rowMeans(param^2))) # average root mean squared error
+  round(mean(colMeans((tr[,pos1] - est[,pos1]))),3)
+  round(mean(colMeans((tr[,pos2] - est[,pos2]))),3)
   
   
-  mean(corr)            # average correlation
-  min(corr)
-  max(corr)
-
+################################################################################
+# Check group level parameters
+################################################################################
+  
+ mu1.est <- c()
+  
+  for(i in 1:100){
+    fit     <- stanfit[[i]]
+    mu1.est[i] <- as.numeric(summary(fit, pars = c("mu1"), probs = c(0.025, 0.975))$summary[,1])
+  }
+  
+  mean(mu1.est)
+  
+  s1.est <- c()
+  
+  for(i in 1:100){
+    fit     <- stanfit[[i]]
+    s1.est[i] <- as.numeric(summary(fit, pars = c("sigma1"), probs = c(0.025, 0.975))$summary[,1])
+  }
+  
+  mean(s1.est)
+  
+  st.est <- c()
+  
+  for(i in 1:100){
+    fit     <- stanfit[[i]]
+    st.est[i] <- as.numeric(summary(fit, pars = c("sigma_t"), probs = c(0.025, 0.975))$summary[,1])
+  }
+  
+  mean(st.est)
+  
+  sc.est <- c()
+  
+  for(i in 1:100){
+    fit     <- stanfit[[i]]
+    sc.est[i] <- as.numeric(summary(fit, pars = c("sigma_c"), probs = c(0.025, 0.975))$summary[,1])
+  }
+  
+  mean(sc.est)
+  
+  
 ################################################################################
 # Check person parameter recovery across 100 replications
 ################################################################################
