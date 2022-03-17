@@ -206,7 +206,7 @@ for(i in 1:100){
 ###############################################################################
 
 
-save.image(here('dglnrt_v1_simulation/results.RData'))
+save.image(here('data/dglnrt_v1_simulation_misidentified/results.RData'))
 
 ###################################################################################
 
@@ -243,7 +243,7 @@ for(i in 1:100){
 # true positive rate, and precisionacross 100 replications
 
 
-th = 0.999
+th = 0.95
 
 fp <- c()
 tp <- c()
@@ -254,7 +254,12 @@ for(i in 1:100){
   Ts    <- T[[i]]
   t     <- ifelse(Ts>th,1,0)
   true  <- c(rep(0,33),rep(1,60))
-  tab   <- table(true,t)
+  tab   <- matrix(NA,nrow=2,ncol=2)
+  tab[1,1] <- sum(true==0 & t==0)
+  tab[1,2] <- sum(true==0 & t==1)
+  tab[2,1] <- sum(true==1 & t==0)
+  tab[2,2] <- sum(true==1 & t==1)
+  
   fp[i] <- tab[1,2]/33
   tp[i] <- tab[2,2]/60
   pr[i] <- tab[2,2]/sum(tab[,2])
@@ -264,7 +269,7 @@ for(i in 1:100){
 
 round(c(mean(tp),min(tp),max(tp)),3)
 round(c(mean(fp),min(fp),max(fp)),3)
-round(c(mean(pr),min(pr),max(pr)),3)
+round(c(mean(pr,na.rm=TRUE),min(pr,na.rm=TRUE),max(pr,na.rm=TRUE)),3)
 
 ################################################################################
 # Check item parameter recovery across 100 replications

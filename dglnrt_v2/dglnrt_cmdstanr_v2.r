@@ -13,6 +13,10 @@ require(pROC)
 
 d.long <- read.csv(here('data/rt_long.csv'))
 
+# Remove the examinees from Form 2
+
+d.long <- d.long[-grep('e20',d.long$EID),]
+
 # Remove missing data in the long format.
 # If someone didn't respond to an item, only that particular item was removed
 # the rest of the data for other items for the person remained.
@@ -23,32 +27,24 @@ d.long <- na.omit(d.long)
 
 d.long$item <- as.numeric(substring(d.long$Item,6))
 
-# a vector for the list of uncommon items in Form 2
-
-icode = c(201,204,205,206,208,210,211,214,216,218,220,222,223,224,226,227,228,
-          229,230,231,232,234,236,237,239,241,242,243,244,247,248,249,253,255,
-          257,258,261,263,264,265,267,268,269,272,279,280,281,282,283,286,287,
-          288,292,296,297,298,302,303,305,307,308,314,316,318,322,323,327,329,
-          331,338,340,341,343,345,346,347,348,350,353,359,366,367,368)
-
-icode2 = 171:253
-
-
-# Change the item number for uncommon items in a way that the item numbers go
-# from 1 to 253
-
-for(i in 1:83){
-  d.long[which(d.long$item == icode[i]),]$item = icode2[i]
-}
-
-unique(d.long$item)
-
-  # Quality check to make sure things were properly changed
+# Check sample size per item
 
     tab <- as.data.frame(table(d.long$Item,d.long$item))
     tab = tab[which(tab[,3]!=0),]
     tab
 
+# Check flagged items
+    
+    tab <- as.data.frame(table(d.long$Item,d.long$i_flag))
+    tab = tab[which(tab[,3]!=0),]
+    table(tab$Var2)
+    
+# Check flagged individuals
+    
+    tab <- as.data.frame(table(d.long$EID,d.long$p_flag))
+    tab = tab[which(tab[,3]!=0),]
+    table(tab$Var2)
+    
 # Add the id variable based on unique EID
     
 d.long$id <- NA
@@ -56,8 +52,6 @@ d.long$id <- NA
 ind = which(substring(d.long$EID,1,3)=='e10')
 d.long[ind,]$id = as.numeric(substring(d.long[ind,]$EID,4,7))
 
-ind = which(substring(d.long$EID,1,3)=='e20')
-d.long[ind,]$id = as.numeric(substring(d.long[ind,]$EID,4,7))+1636
 
   # Quality check to make sure things were properly changed
 
@@ -66,6 +60,11 @@ d.long[ind,]$id = as.numeric(substring(d.long[ind,]$EID,4,7))+1636
     tab
 
     unique(d.long$id)
+    
+# There are 1636 examinees, 170 items
+# 64 items flagged
+# 46 individuals flagged
+    
     
 ########################################################################
 # Descriptive Statistics
@@ -188,10 +187,17 @@ mean(rt01)
     
 d.long$i.status <- ifelse(d.long$i_flag=='Flagged',1,0)
 
+length(unique(d.long$id))
+
+length(unique(d.long$item))
+
+
+
+
 # Data object for Stan run
     
-data_rt <- list(J              = 253,
-                I              = 3280,
+data_rt <- list(J              = 170,
+                I              = 1636,
                 n_obs          = length(d.long$RT),
                 ind_person_obs = d.long$id,
                 ind_item_obs   = d.long$item,
@@ -295,7 +301,7 @@ model{
   # alpha estimates (Eq. 24)
   
   alpha0 = c()
-  for(i in 1:253){
+  for(i in 1:170){
     alpha0[i] = sqrt(1/mean((d.long[which(d.long$item==i),]$RT - beta0[i])^2))
   }
 
@@ -305,7 +311,7 @@ model{
   # hyper parameters for inverse gamma 
   # Levy, Bayesian Psychometric Analysis, page 83, inverse gamma prior distribution
   
-  N= 1600
+  N= 1636
   a = mean(alpha0)
 
   v0 = N/2
@@ -342,7 +348,7 @@ mean(test.gamma)
 
 # Read the Stan Model Syntax 
 
-mod <- cmdstan_model(here('dglnrt_v2.stan'))
+mod <- cmdstan_model(here('dglnrt_v2/dglnrt_v2.stan'))
 
 # Fit the model using cmdstan
 

@@ -42,11 +42,11 @@ model{
   tau_t    ~ normal(0,sigma_t);
   tau_c    ~ normal(0,sigma_c);
   
-  mu1      ~ normal(3.98,1);
+  mu1      ~ normal(3.97,1);
   sigma1   ~ exponential(1);
     beta     ~ normal(mu1,sigma1);
 
-    alpha    ~ inv_gamma(800,1550);
+    alpha    ~ inv_gamma(818,1571);
   
   for (i in 1:n_obs) {
     
