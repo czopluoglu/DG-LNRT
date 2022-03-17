@@ -166,12 +166,14 @@ for(i in 1:100){
     direction   = "long"
   )
   
-  partially_compromised_items <- c(24,22,20,18,16,14)
+  truly_compromised_items <- c(24,22,20,18,16,14)
+  misidentified_items     <- c(1,3,5,7,9,11)
   
+  mixed_items <- c(misidentified_items,truly_compromised_items)
   
   d.long$i.status <- 0
   
-  d.long[d.long$Item%in%partially_compromised_items,]$i.status <- 1
+  d.long[d.long$Item%in%mixed_items,]$i.status <- 1
   
   d.long$logRT <- log(d.long$RT)
 

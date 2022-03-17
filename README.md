@@ -17,7 +17,13 @@ by fitting a multigroup lognormal response time model with a gating mechanism.
 there is item preknowledge. The exact same setting of the first real dataset was replicated.
 The $\beta$, $\alpha$, and $\tau_t$, and $\tau_c$ parameters were being generated 
 using similar distributions obtained from the first real dataset by fitting a 
-multigroup lognormal response time model with a gating mechanism.
+multigroup lognormal response time model with a gating mechanism. It is assumed that there was a perfect recovery of compromised items, and the item compromise status was correctly specified for all 12 compromised items during the model fitting process.
+
+- **/dglnrt_v1_simulation_partially_identified**: This folder includes the code for a simulation study where
+there is item preknowledge with partially identified compromised items. The setting is exactly identical to the **/dglnrt_v1_simulation** with one important difference. It is assumed that there was an imperfect recovery of compromised items, and the item compromise status was correctly specified for only six out of 12 compromised items during the model fitting process. The remaining six compromised items were treated as not compromised during the model fitting process.
+
+- **/dglnrt_v1_simulation_misidentified**: This folder includes the code for a simulation study where
+there is item preknowledge with partially identified compromised items and misidentified uncompromised items. The setting is exactly identical to the **/dglnrt_v1_simulation** with one important difference. It is assumed that the item compromise status was correctly specified for only six out of 12 compromised items during the model fitting process. The remaining six compromised items were treated as not compromised during the model fitting process. In addition, six out of 13 uncompromised items were assumed to be incorrectly identified as compromised, and they were treated as compromised items during the model fitting process.
 
 - **/dglnrt_v2**: This folder includes the code for fitting DG-LNRT to the second real
 dataset (Cizek & Wollack, 2016).
