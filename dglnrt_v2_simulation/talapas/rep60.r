@@ -6,12 +6,12 @@ require(here)
 require(rstan)
 require(psych)
 
-set.seed(1060)
 ###############################################################################
 
 # This is a code being used for simulating item preknowledge data. 
-# There are 3280 examinees and 253 items as in Real Dataset 2.
-# There are 91 items compromised, and 94 examinees had access.
+# There are 1636 examinees and 170 items as in Real Dataset 2.
+# There are 64 items compromised, and 46 examinees were assumed to have access
+# to the 64 compromised items.
 
 # DG-LNRT model is fitted as usual. 
 
@@ -34,26 +34,26 @@ set.seed(1060)
     
     # MODEL PARAMETERS
     
-    beta  <- rnorm(253,3.98,0.32)
-    alpha <- rnorm(253,2.06,0.28)
+    beta  <- rnorm(170,3.98,0.32)
+    alpha <- rnorm(170,2.06,0.28)
     
     # Tau for unflagged examinees
     
     cor0 <- matrix(c(1,.95,.95,1),2,2)
-    tau0 <- mvrnorm(3186,c(0,0),cor2cov(cor0,c(0.17,0.16)))
+    tau0 <- mvrnorm(1590,c(0,0),cor2cov(cor0,c(0.17,0.16)))
     
     # Tau for flagged examinees 
     
     cor1 <- matrix(c(1,.92,.92,1),2,2)
-    tau1 <- mvrnorm(94,c(0.19,0.28),cor2cov(cor1,c(0.35,0.30)))
+    tau1 <- mvrnorm(46,c(0.19,0.28),cor2cov(cor1,c(0.35,0.30)))
        
     # A vector for item status (0: not disclosed, 1:disclosed)
     
-    C    <- c(rep(0,162),rep(1,91))
+    C    <- c(rep(0,106),rep(1,64))
     
       # Shuffle the vector, randomly selected 91 items are compromised
     
-        C <- C[base::sample(1:253,253)]
+        C <- C[base::sample(1:170,170)]
 	
     # RESPONSE TIME GENERATION
     
@@ -62,10 +62,10 @@ set.seed(1060)
     
     # Unflagged Examinees
     
-    rt0 <- matrix(nrow = 3186, ncol = 253)
+    rt0 <- matrix(nrow = 1590, ncol = 170)
     
-    for (i in 1:3186) {
-      for (j in 1:253) {
+    for (i in 1:1590) {
+      for (j in 1:170) {
         p_t = beta[j] - tau0[i, 1]
         p_c = beta[j] - tau0[i, 2]
         p   = p_t * (1 - C[j]) + p_c * C[j]
@@ -75,10 +75,10 @@ set.seed(1060)
     
     # Flagged Examinees
     
-    rt1 <- matrix(nrow = 94, ncol = 253)
+    rt1 <- matrix(nrow = 46, ncol = 170)
     
-    for (i in 1:94) {
-      for (j in 1:253) {
+    for (i in 1:46) {
+      for (j in 1:170) {
         p_t = beta[j] - tau1[i, 1]
         p_c = beta[j] - tau1[i, 2]
         p   = p_t * (1 - C[j]) + p_c * C[j]
@@ -96,14 +96,6 @@ set.seed(1060)
     
     rt <- rt[sample(1:nrow(rt),nrow(rt),replace = FALSE),]
     
-    # Introduce missingness as in the dataset 
-    # Each half of the examinees respond only to 170 items
-    # 87 items are in common.
-    
-      rt[1:1640,171:253] = NA
-      rt[1641:3280,88:170] = NA
-    
-    
     return(list(
       rt = rt,
       b = beta,
@@ -113,13 +105,6 @@ set.seed(1060)
       C = C
     ))
   }
-
-  
-  #k = 17
-  #mean(a$rt[1:3186,k])
-  #mean(a$rt[3187:3280,k])
-  #C[k]
-  
   
 ##############################################################################
 
@@ -127,16 +112,16 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt/dglnrt2.stan')
   
     data <- sim_dglnrt()
     
-    d.sub <- data$rt[,1:253]
+    d.sub <- data$rt[,1:170]
     
-    d.sub$ID <- 1:3280
+    d.sub$ID <- 1:1636
     
     d.long <- reshape(
       data        = d.sub,
       idvar       = "ID",
-      varying     = list(colnames(d.sub)[1:253]),
+      varying     = list(colnames(d.sub)[1:170]),
       timevar     = "Item",
-      times       = 1:253,
+      times       = 1:170,
       v.names      = "RT",
       direction   = "long"
     )
@@ -152,8 +137,8 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt/dglnrt2.stan')
     d.long[which(d.long$Item%in%flagged.item==FALSE),]$i.status = 0
     
     data_rt <- list(
-      J              = 253,
-      I              = 3280,
+      J              = 170,
+      I              = 1636,
       n_obs          = length(d.long$RT),
       ind_person_obs = d.long$ID,
       ind_item_obs   = d.long$Item,
