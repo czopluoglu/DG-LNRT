@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --account=edquant
+#SBATCH --partition=long
+#SBATCH --job-name=rep87
+#SBATCH --output=/gpfs/projects/edquant/cengiz/dglnrt_partial/rep87.out
+#SBATCH --error=/gpfs/projects/edquant/cengiz/dglnrt_partial/rep87.err
+#SBATCH --time=10080
+#SBATCH --mem=4000M
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=4
+
+module load gcc
+module load R/4.0.2
+
+R --no-save < /gpfs/projects/edquant/cengiz/dglnrt_partial/rep87.r
