@@ -371,7 +371,7 @@ fit$cmdstan_summary()
 
 stanfit <- rstan::read_stan_csv(fit$output_files())
 
-save.image(here('dglnrt_v2/results.RData'))
+save.image(here('data/dglnrt_v2/results.RData'))
 
 
 ################################################################################
@@ -391,7 +391,7 @@ extract(stanfit)
 # Create a vector for person status (flagged vs. not flagged) to compare with Ts
 
 flagged <- c()
-for(i in 1:3280){
+for(i in 1:1636){
   flagged[i] <- unique(d.long[which(d.long$id==i),]$p_flag)
 }
 

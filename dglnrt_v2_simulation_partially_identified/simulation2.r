@@ -113,7 +113,7 @@ require(psych)
 
   # Read the Stan model syntax, this is same across all replications
   
-    mod <- cmdstan_model(here('dglnrt_v2_simulation/dglnrt2.stan'))
+    mod <- cmdstan_model(here('dglnrt_v2_simulation_partially_identified/dglnrt2.stan'))
 
   # Simulate data 
     

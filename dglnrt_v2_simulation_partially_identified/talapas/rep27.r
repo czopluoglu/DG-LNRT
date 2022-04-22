@@ -171,4 +171,4 @@ mod <- cmdstan_model('/gpfs/projects/edquant/cengiz/dglnrt_partial/dglnrt2.stan'
     
     
     
-save.image('/gpfs/projects/edquant/cengiz/dglnrt_partial/rep1.RData')
+save.image('/gpfs/projects/edquant/cengiz/dglnrt_partial/rep27.RData')

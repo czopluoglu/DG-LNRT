@@ -134,8 +134,7 @@ stanfit <- vector('list',100)
 
 # Read the Stan model syntax, this is same across all replications
 
-mod <- cmdstan_model(here('dglnrt_v1_simulation/dglnrt2.stan'))
-
+mod <- cmdstan_model(here('dglnrt_v1_simulation_partially_identified/dglnrt2.stan'))
 
 # Run a loop from 1 to 100
 # Each replication generates data based on the above specifications
@@ -146,7 +145,7 @@ mod <- cmdstan_model(here('dglnrt_v1_simulation/dglnrt2.stan'))
 # identified, so only 6 out of 12 compromised items are identified 
 # and used in the model
 
-for(i in 1:100){
+for(i in 60:100){
   
   data <- sim_dglnrt()
   
@@ -200,6 +199,8 @@ for(i in 1:100){
   fit$cmdstan_summary()
   
   stanfit[[i]] <- rstan::read_stan_csv(fit$output_files())
+  
+  print(i)
 }  
 ###############################################################################
 
