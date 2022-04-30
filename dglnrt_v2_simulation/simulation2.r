@@ -231,14 +231,14 @@ for(kk in 1:100){
 
 ################################################################################
 # For each replication, extract the estimate of T for each individual
-# Save them in a 100 x 3280 matrix
+# Save them in a 100 x 1636 matrix
 # Each row represents a replication
 # Each column represents an individual within a replication
 # Cell values are the estimate of posterior probability of item preknowledge
 # for an individual in a replication
 
 
-param <- matrix(nrow=100,ncol=3280)
+param <- matrix(nrow=100,ncol=1636)
 
 for(i in 1:100){
   
@@ -252,35 +252,37 @@ for(i in 1:100){
   print(i)
 }
 
-param <- param[1:97,]
-
 
 # For a given cut-off value, compute the average proportion of falsely 
 # identified individuals across 100 replications
 
-table(data.list[[1]]$rt$gr)
-
 th = 0.999
 
-fp <- c()
-tp <- c()
-pr <- c()
+out <- data.frame(matrix(NA,100,4))
+colnames(out) <- c('FP','TP')
 
-for(i in 1:97){
+for(R in 1:100){
   
-  Ts <- param[i,]
-  t  <- ifelse(Ts>th,1,0)
-  true <- ifelse(data.list[[i]]$rt$gr==2,1,0)
-  tab <- table(true,t)
-  fp[i] <- tab[1,2]/1590
-  tp[i] <- tab[2,2]/46
-  pr[i] <- tab[2,2]/sum(tab[,2])
-  print(i)
+  Ts   <- param[R,]
+  t    <- ifelse(Ts>th,1,0)
+  true <- ifelse(data.list[[R]]$rt$gr==2,1,0)
+  tab  <- table(t,true)
+  
+  out[R,]$FP  = tab[2,1]
+  out[R,]$TP  = tab[2,2]
 }
 
-round(c(mean(tp),min(tp),max(tp)),3)
-round(c(mean(fp),min(fp),max(fp)),3)
-round(c(mean(pr),min(pr),max(pr)),3)
+# FPR across 100 replications
+
+sum(out$FP)/(1590*100)
+
+# TPR across 100 replications
+
+sum(out$TP)/(46*100)
+
+# Precision across 100 replications
+
+sum(out$TP)/(sum(out$FP)+sum(out$TP))
 
 ################################################################################
 # Check item parameter recovery across 100 replications

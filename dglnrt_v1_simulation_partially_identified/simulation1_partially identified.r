@@ -18,8 +18,11 @@ require(psych)
 # We simulate 33 honest examinees with no item preknowledge and 60 examinees with 
 # item preknowledge using the same parameters obtained from real data.
 
-# There were 12 compromised items and 13 uncompromised items.
-# We assume only half of the compromised items are known (partially identified) 
+# There were 12 compromised items and 13 uncompromised items during data generation
+# process.
+# While fitting the model, we assume only half of the compromised items (6) are 
+# known (partially identified) while other hallf were not detected so
+# they were treated as uncompromised during the model fitting process
 
 # Parameters come from EMIP paper where a multigroup lognormal response time
 # model was fitted with gated mechanism
@@ -167,10 +170,11 @@ for(i in 60:100){
   
   partially_compromised_items <- c(24,22,20,18,16,14)
   
-  
   d.long$i.status <- 0
-  
   d.long[d.long$Item%in%partially_compromised_items,]$i.status <- 1
+  
+    # Only six items were treated as compromised, remaining 6 undetected
+  
   
   d.long$logRT <- log(d.long$RT)
 
@@ -219,7 +223,7 @@ save.image(here('dglnrt_v1_simulation/results.RData'))
 ################################################################################
 ################################################################################
 
-load(here("data/dglnrt_v1_simulation/results.RData"))
+load(here("data/dglnrt_v1_simulation_partially_identified/results.RData"))
 
 # For each replication, extract the estimate of T for each individual
 # Save them in a 100 x 93 matrix
@@ -239,31 +243,32 @@ for(i in 1:100){
 }
 
 # For a given cut-off value, compute the average false positive rate, 
-# true positive rate, and precisionacross 100 replications
-
+# true positive rate, and precision across 100 replications
 
 th = 0.999
 
-fp <- c()
-tp <- c()
-pr <- c()
+out <- data.frame(matrix(NA,100,4))
+colnames(out) <- c('FPR','TPR','PR_1','PR_2')
 
-for(i in 1:100){
+for(R in 1:100){
   
-  Ts    <- T[[i]]
-  t     <- ifelse(Ts>th,1,0)
-  true  <- c(rep(0,33),rep(1,60))
-  tab   <- table(true,t)
-  fp[i] <- tab[1,2]/33
-  tp[i] <- tab[2,2]/60
-  pr[i] <- tab[2,2]/sum(tab[,2])
-  
-  print(i)
+  out[R,]$FPR  = sum(T[[R]][1:33]>th)
+  out[R,]$TPR  = sum(T[[R]][34:93]>th)
+  out[R,]$PR_1 = sum(ifelse(sim.datasets[[R]]$rt[T[[R]]>th,]$gr==1,1,0))
+  out[R,]$PR_2 = sum(ifelse(sim.datasets[[R]]$rt[T[[R]]>th,]$gr==1,0,1))
 }
 
-round(c(mean(tp),min(tp),max(tp)),3)
-round(c(mean(fp),min(fp),max(fp)),3)
-round(c(mean(pr),min(pr),max(pr)),3)
+# FPR across 100 replications
+
+sum(out$FPR)/3300
+
+# TPR across 100 replications
+
+sum(out$TPR)/6000  
+
+# Precision across 100 replications
+
+sum(out$PR_2)/(sum(out$PR_1)+sum(out$PR_2))
 
 ################################################################################
 # Check item parameter recovery across 100 replications

@@ -164,14 +164,14 @@ fit$cmdstan_summary()
 
 stanfit <- rstan::read_stan_csv(fit$output_files())
 
-save.image(here('data/dgirt_v1/results_dgirt_v1.RData'))
+save.image(here('data/dgirt_v2/results_dgirt_v2.RData'))
 
 ################################################################################
 #                               OUTPUT ANALYSIS
 
 # Load the pre-saved model output
 
-load(here('data/dgirt_v1/results_dgirt_v1.RData'))
+load(here('data/dgirt_v2/results_dgirt_v2.RData'))
 
 # Summary of all parameters
 
@@ -207,13 +207,13 @@ Ts
 # For a given threshold, check the number of identified individuals in the data 
 # and compare it to their known status of item preknowledge
 
-th = .99
+th = .988
 
-table(ifelse(Ts[,1]>th,1,0),d$COND)
+table(ifelse(Ts[,1]>th,1,0),d$Flagged)
 
- # FP: 0/33
- # TP: 7/60
- # PR: 7/7
+ # FP: 1/1590
+ # TP: 2//46
+ # PR: 2/3
 
 
 hist(Ts[,1])

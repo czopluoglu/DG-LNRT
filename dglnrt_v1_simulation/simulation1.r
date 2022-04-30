@@ -229,28 +229,30 @@ for(i in 1:100){
 # true positive rate, and precisionacross 100 replications
 
 
-th = 0.999
+th = 0.99
 
-fp <- c()
-tp <- c()
-pr <- c()
+out <- data.frame(matrix(NA,100,4))
+colnames(out) <- c('FPR','TPR','PR_1','PR_2')
 
-for(i in 1:100){
+for(R in 1:100){
   
-  Ts    <- T[[i]]
-  t     <- ifelse(Ts>th,1,0)
-  true  <- c(rep(0,33),rep(1,60))
-  tab   <- table(true,t)
-  fp[i] <- tab[1,2]/33
-  tp[i] <- tab[2,2]/60
-  pr[i] <- tab[2,2]/sum(tab[,2])
-  
-  print(i)
+  out[R,]$FPR  = sum(T[[R]][1:33]>th)
+  out[R,]$TPR  = sum(T[[R]][34:93]>th)
+  out[R,]$PR_1 = sum(ifelse(sim.datasets[[R]]$rt[T[[R]]>th,]$gr==1,1,0))
+  out[R,]$PR_2 = sum(ifelse(sim.datasets[[R]]$rt[T[[R]]>th,]$gr==1,0,1))
 }
 
-round(c(mean(tp),min(tp),max(tp)),3)
-round(c(mean(fp),min(fp),max(fp)),3)
-round(c(mean(pr),min(pr),max(pr)),3)
+# FPR across 100 replications
+
+sum(out$FPR)/3300
+
+# TPR across 100 replications
+
+sum(out$TPR)/6000  
+
+# Precision across 100 replications
+
+sum(out$PR_2)/(sum(out$PR_1)+sum(out$PR_2))
 
 ################################################################################
 # Check item parameter recovery across 100 replications

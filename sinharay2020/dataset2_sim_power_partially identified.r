@@ -150,14 +150,17 @@ for(R in 1:100){
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
   
+    # Take a random sample of 32 compromised items out of 64
+    # the remaining 32 will be treated as uncompromised
+  
+  partially_identified_compromised <- sample(which(data$C==1),32)
   
   L[[R]] <- Lambdas(ltimes = as.matrix(ly),
-                    comp   = which(data$C==1),
+                    comp   = partially_identified_compromised,
                     alpha  = alpha.est,
                     beta   = beta.est)
   print(R)            
 }
-
 
 th = .999
 
@@ -184,6 +187,8 @@ sum(out$TPR)/(46*100)
 # Precision across 1000 replications
 
 sum(out$TPR)/(sum(out$TPR)+sum(out$FPR))
+
+
 
 
 ################################################################################

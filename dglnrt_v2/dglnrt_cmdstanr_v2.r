@@ -5,7 +5,7 @@ require(rstan)
 require(pROC)
 ################################################################################
 
-# This fits the model to the real dataset by Cizek and Wollack
+# This fits the model to the real dataset (Form A) by Cizek and Wollack (2017)
 
 ################################################################################
 
@@ -386,7 +386,6 @@ load(here("data/dglnrt_v2/results.RData"))
 T <- summary(stanfit, pars = c("T"), probs = c(0.025, 0.975))$summary
 describe(T[,1])
 
-extract(stanfit)
 
 # Create a vector for person status (flagged vs. not flagged) to compare with Ts
 

@@ -12,22 +12,22 @@ sim_dglnrt <- function() {
   
   # MODEL PARAMETERS
   
-  beta  <- rnorm(253,3.98,0.32)
-  alpha <- rnorm(253,2.06,0.28)
+  beta  <- rnorm(170,3.98,0.32)
+  alpha <- rnorm(170,2.06,0.28)
   
   # Tau for unflagged examinees
   
   cor0 <- matrix(c(1,.95,.95,1),2,2)
-  tau0 <- mvrnorm(3186,c(0,0),cor2cov(cor0,c(0.17,0.16)))
+  tau0 <- mvrnorm(1590,c(0,0),cor2cov(cor0,c(0.17,0.16)))
   
   # Tau for flagged examinees 
   
   cor1 <- matrix(c(1,.92,.92,1),2,2)
-  tau1 <- mvrnorm(94,c(0.19,0.28),cor2cov(cor1,c(0.35,0.30)))
+  tau1 <- mvrnorm(46,c(0.19,0.28),cor2cov(cor1,c(0.35,0.30)))
   
   # A vector for item status (0: not disclosed, 1:disclosed)
   
-  C    <- rep(0,253)
+  C    <- rep(0,170)
   
   # null condition, all zeros
   
@@ -38,10 +38,10 @@ sim_dglnrt <- function() {
   
   # Unflagged Examinees
   
-  rt0 <- matrix(nrow = 3186, ncol = 253)
+  rt0 <- matrix(nrow = 1590, ncol = 170)
   
-  for (i in 1:3186) {
-    for (j in 1:253) {
+  for (i in 1:1590) {
+    for (j in 1:170) {
       p_t = beta[j] - tau0[i, 1]
       p_c = beta[j] - tau0[i, 2]
       p   = p_t * (1 - C[j]) + p_c * C[j]
@@ -51,10 +51,10 @@ sim_dglnrt <- function() {
   
   # Flagged Examinees
   
-  rt1 <- matrix(nrow = 94, ncol = 253)
+  rt1 <- matrix(nrow = 46, ncol = 170)
   
-  for (i in 1:94) {
-    for (j in 1:253) {
+  for (i in 1:46) {
+    for (j in 1:170) {
       p_t = beta[j] - tau1[i, 1]
       p_c = beta[j] - tau1[i, 2]
       p   = p_t * (1 - C[j]) + p_c * C[j]
@@ -71,14 +71,6 @@ sim_dglnrt <- function() {
   # Random shuffle of examinees
   
   rt <- rt[sample(1:nrow(rt),nrow(rt),replace = FALSE),]
-  
-  # Introduce missingness as in the dataset 
-  # Each half of the examinees respond only to 170 items
-  # 87 items are in common.
-  
-  rt[1:1640,171:253] = NA
-  rt[1641:3280,88:170] = NA
-  
   
   return(list(
     rt = rt,
@@ -122,9 +114,8 @@ Lambdas <- function(ltimes, comp,alpha,beta){
 
 set.seed(4102021)
 
-TypeI <- matrix(nrow=100,ncol=4)
-
-datas <- vector('list',100)
+L     <- vector('list',100)
+datas  <- vector('list',100)
 params <- vector('list',100)
 
 for(R in 1:100){
@@ -133,10 +124,9 @@ for(R in 1:100){
   
   datas[[R]] <- data
   
-  ly        <- data.frame(log(data$rt[,1:253]))
+  ly        <- data.frame(log(data$rt[,1:170]))
   
   n <- ncol(ly)
-  
   
   model     <- paste("f1=~", 
                      paste0("a*X",1:(n-1)," + ", collapse=""), 
@@ -153,25 +143,30 @@ for(R in 1:100){
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
   
-  L <- Lambdas(ltimes = as.matrix(ly),
-               comp   = sample(1:253,91),
+  L[[R]] <- Lambdas(ltimes = as.matrix(ly),
+               comp   = sample(1:170,64),
                alpha  = alpha.est,
                beta   = beta.est)
-  
-  TypeI[R,] = c(length(which(L>qnorm(0.9))),
-                length(which(L>qnorm(0.95))),
-                length(which(L>qnorm(0.99))),
-                length(which(L>qnorm(0.999))))
   
   print(R)               
 }
 
-round(colMeans(TypeI)/3280,4)
 
-round(apply(TypeI,2,min)/3280,4)
+th = .999
 
-round(apply(TypeI,2,max)/3280,4)
+fp <- c()
 
+for(i in 1:100){
+  fp[i] = sum(L[[i]]>qnorm(th))
+}
+
+sum(fp)/(1636*100)
+
+mean(fp/1636)
+min(fp/1636)
+max(fp/1636)
+
+  
 ################################################################################
 
 # Parameter recovery

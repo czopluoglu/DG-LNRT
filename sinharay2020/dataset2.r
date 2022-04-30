@@ -1,7 +1,7 @@
 
 load(here("data/dglnrt_v2/results.RData"))
 
-d.wide <- reshape(d.long,
+d.wide <- reshape(d.long[,c('id','RT','item','p_flag')],
                   idvar = 'id',
                   v.names = 'RT',
                   timevar = 'item',
@@ -12,7 +12,7 @@ table(d.wide$p_flag)
 
 i.st <- c()
 
-for(i in 1:253){
+for(i in 1:170){
   
   i.st[i] = unique(d.long[which(d.long$item==i),]$i.status)
   
@@ -22,7 +22,7 @@ comp <- which(i.st==1)
 
 ################################################################################
 
-rt <- d.wide[,8:260]
+rt <- d.wide[,3:172]
 
 ilabels <- as.numeric(substring(colnames(rt),4))
 
@@ -82,20 +82,17 @@ out <- cbind(L,d.wide$p_flag)
 
 out  <- na.omit(out)
 
-length(which(out[which(out[,2]==0),1]>qnorm(0.9)))/3186
-length(which(out[which(out[,2]==0),1]>qnorm(0.95)))/3186
-length(which(out[which(out[,2]==0),1]>qnorm(0.99)))/3186
-length(which(out[which(out[,2]==0),1]>qnorm(0.999)))/3186
+# FPR
+
+length(which(out[which(out[,2]==0),1]>qnorm(0.99)))/1590
+length(which(out[which(out[,2]==0),1]>qnorm(0.999)))/1590
+
+#TPR
+
+length(which(out[which(out[,2]==1),1]>qnorm(0.99)))/46
+length(which(out[which(out[,2]==1),1]>qnorm(0.999)))/46
 
 
-length(which(out[which(out[,2]==1),1]>qnorm(0.9)))/94
-length(which(out[which(out[,2]==1),1]>qnorm(0.95)))/94
-length(which(out[which(out[,2]==1),1]>qnorm(0.99)))/94
-length(which(out[which(out[,2]==1),1]>qnorm(0.999)))/94
-
-
-table(out[which(out[,1]>qnorm(0.9)),2])
-table(out[which(out[,1]>qnorm(0.95)),2])
 table(out[which(out[,1]>qnorm(0.99)),2])
 table(out[which(out[,1]>qnorm(0.999)),2])
 

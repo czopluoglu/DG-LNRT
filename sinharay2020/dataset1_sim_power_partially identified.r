@@ -1,8 +1,8 @@
-####################################################################
+################################################################################
 #            MODEL PARAMETER GENERATION
 #
-# These parameters are reported in Table 4
-####################################################################
+# These parameters are reported in one of the tables in the paper
+################################################################################
 
 sim_dglnrt <- function() {
   
@@ -133,7 +133,7 @@ params <- vector('list',1000)
 L <- vector('list',1000)
 
 
-for(R in 884:1000){
+for(R in 885:1000){
   
   data <- sim_dglnrt()
   
@@ -163,12 +163,16 @@ for(R in 884:1000){
   
   
   L[[R]] <- Lambdas(ltimes = as.matrix(ly),
-               comp   = seq(2,25,2),
+               comp   = c(24,22,20,18,16,14),
                alpha  = alpha.est,
                beta   = beta.est)
   
-  print(R)               
+    # comp   = c(24,22,20,18,16,14)
+    # only six of 12 compromised items are provided to the function
+       
+  print(R)   
 }
+
 
 th = .999
 
@@ -194,7 +198,6 @@ sum(out$TPR)/60000
 # Precision across 1000 replications
 
 sum(out$PR_2)/(sum(out$PR_1)+sum(out$PR_2))
-
 
 
 

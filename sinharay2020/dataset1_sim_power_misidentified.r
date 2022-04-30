@@ -1,8 +1,8 @@
-####################################################################
+################################################################################
 #            MODEL PARAMETER GENERATION
 #
-# These parameters are reported in Table 4
-####################################################################
+# These parameters are reported in one of the tables in the paper
+################################################################################
 
 sim_dglnrt <- function() {
   
@@ -132,8 +132,7 @@ datas <- vector('list',1000)
 params <- vector('list',1000)
 L <- vector('list',1000)
 
-
-for(R in 884:1000){
+for(R in 1:1000){
   
   data <- sim_dglnrt()
   
@@ -161,14 +160,20 @@ for(R in 884:1000){
   alpha.est <- 1/sqrt(pars[1:ncol(ly)])
   beta.est  <- pars[(ncol(ly)+2):(2*ncol(ly)+1)]
   
+  truly_compromised_items <- c(24,22,20,18,16,14)
+  misidentified_items     <- c(1,3,5,7,9,11)
   
   L[[R]] <- Lambdas(ltimes = as.matrix(ly),
-               comp   = seq(2,25,2),
+               comp   = c(truly_compromised_items,misidentified_items),
                alpha  = alpha.est,
                beta   = beta.est)
+    
+    # 6 items are truly compromised, and 6 items are incorrectly identified
+    # as compromised
   
   print(R)               
 }
+
 
 th = .999
 
@@ -176,7 +181,7 @@ out <- data.frame(matrix(NA,1000,4))
 colnames(out) <- c('FPR','TPR','PR_1','PR_2')
 
 for(R in 1:1000){
-  
+
   out[R,]$FPR  = sum(L[[R]][1:33]>qnorm(th))
   out[R,]$TPR  = sum(L[[R]][34:93]>qnorm(th))
   out[R,]$PR_1 = sum(ifelse(datas[[R]]$rt[L[[R]]>qnorm(th),]$gr==1,1,0))
@@ -185,18 +190,17 @@ for(R in 1:1000){
 
 # FPR across 1000 replications
 
-sum(out$FPR)/33000  
+  sum(out$FPR)/33000  
 
 # TPR across 1000 replications
-
+  
 sum(out$TPR)/60000  
 
 # Precision across 1000 replications
 
 sum(out$PR_2)/(sum(out$PR_1)+sum(out$PR_2))
 
-
-
+  
 
 ################################################################################
 
