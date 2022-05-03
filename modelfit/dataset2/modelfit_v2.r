@@ -25,7 +25,7 @@ table(d.wide$p_flag)
 
 i.st <- c()
 
-for(i in 1:253){
+for(i in 1:170){
   
   i.st[i] = unique(d.long[which(d.long$item==i),]$i.status)
   
@@ -36,7 +36,7 @@ comp2 <- which(i.st==0)
 
 p.st <- c()
 
-for(i in 1:3280){
+for(i in 1:1636){
   
   p.st[i] = unique(d.long[which(d.long$id==i),]$p_flag)
   
@@ -47,7 +47,7 @@ cheaters2 <- which(p.st==0)
 
 
 
-rt <- d.wide[,3:255]
+rt <- d.wide[,3:172]
 
 ilabels <- as.numeric(substring(colnames(rt),4))
 
@@ -222,7 +222,7 @@ for(i in 1:(length(ind)-1)){
 
 res.wide <- rt - rt_pred
 
-for(i in 1:253){
+for(i in 1:170){
   
   res.wide[,i]/(1/alphas[i])
   

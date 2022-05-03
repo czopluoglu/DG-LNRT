@@ -425,12 +425,7 @@ describe(betas[,1])
 
 alphas <- summary(stanfit, pars = c("alpha"), probs = c(0.025, 0.975))$summary
 alphas
-describe(alphas[,1]^2)
-
-alpha.chain <- extract(stanfit)$alpha
-
-alphas2 <- alpha.chain^2
-
+describe(alphas[,1])
 
 # Extract the tau_t
 

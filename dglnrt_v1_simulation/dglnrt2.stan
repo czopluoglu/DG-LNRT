@@ -57,6 +57,6 @@ model{
       (((1-i_status_obs[i])*p_t + 
           (i_status_obs[i])*p_c)^T[ind_person_obs[i]]);
     
-    Y[i] ~ normal(p,1/(alpha[ind_item_obs[i]]));
+    Y[i] ~ normal(p,1/(alpha[ind_item_obs[i]]^2));
   }
 }
