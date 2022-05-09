@@ -166,7 +166,7 @@ pl <- lapply (comp,
 )
 
 
-ind <- seq(1,length(pl)+1,6)
+ind <- c(seq(1,length(pl)+1,6),length(pl)+1)
 
 for(i in 1:(length(ind)-1)){
   
@@ -203,8 +203,7 @@ pl <- lapply (comp2,
               }
 )
 
-
-ind <- seq(1,length(pl)+1,6)
+ind <- c(seq(1,length(pl)+1,6),length(pl)+1)
 
 for(i in 1:(length(ind)-1)){
   

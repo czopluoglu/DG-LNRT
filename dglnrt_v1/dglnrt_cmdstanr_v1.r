@@ -208,7 +208,7 @@ data_rt <- list(J              = 25,
 
 # Read the Stan Model Syntax 
     
-mod <- cmdstan_model(here('dglnrt2.stan'))
+mod <- cmdstan_model(here('dglnrt_v1/dglnrt2.stan'))
 
 # Fit the model using cmdstan
     
@@ -275,7 +275,7 @@ Ts
 # For a given threshold, check the number of identified individuals in the data 
 # and compare it to their known status of item preknowledge
 
-th = .99
+th = .999
 
 table(ifelse(Ts[,1]>th,1,0),d.sub$COND)
 

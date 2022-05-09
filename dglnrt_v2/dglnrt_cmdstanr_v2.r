@@ -88,6 +88,9 @@ for(i in 1:nrow(desc.rt)){
 
 rt10 <- desc.rt[,3]
 
+sum(desc.rt[,3]*desc.rt[,2])/sum(desc.rt[,2])
+
+
 # Flagged Items - Flagged Examinees
 
 
@@ -107,6 +110,10 @@ for(i in 1:nrow(desc.rt)){
 }
 
 rt11 <- desc.rt[,3]
+
+sum(desc.rt[,3]*desc.rt[,2])/sum(desc.rt[,2])
+
+
 
 
 plot(rt10,rt11,
@@ -138,6 +145,7 @@ for(i in 1:nrow(desc.rt)){
 
 rt00 <- desc.rt[,3]
 
+sum(desc.rt[,3]*desc.rt[,2])/sum(desc.rt[,2])
 
 
 # Unflagged Items - Flagged Examinees
@@ -159,6 +167,8 @@ for(i in 1:nrow(desc.rt)){
 
 
 rt01 <- desc.rt[,3]
+
+sum(desc.rt[,3]*desc.rt[,2])/sum(desc.rt[,2])
 
 
 plot(rt00,rt01,
@@ -278,7 +288,7 @@ model{
       (((1-i_status_obs[i])*p_t + 
           (i_status_obs[i])*p_c)^T[ind_person_obs[i]]);
     
-    Y[i] ~ normal(p,1/(alpha[ind_item_obs[i]]^2));
+    Y[i] ~ normal(p,1/(alpha[ind_item_obs[i]]));
   }
 }
 
@@ -318,7 +328,7 @@ model{
   v0
   v0*a
 
-  # alpha ~ InvGamm(800,1550)
+  # alpha ~ InvGamm(818,1571)
 
 require(invgamma)
 
